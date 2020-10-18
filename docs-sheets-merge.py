@@ -9,6 +9,7 @@ from oauth2client import file, client, tools
 # Fill-in IDs of your Docs template & any Sheets data source
 DOCS_FILE_ID = '1JfYsCbmk1uTGrgC15OFubSjPbbD0hopqv4d0xwOyzOM'
 SHEETS_FILE_ID = '1yJ7IM1NaNHq2xm7zPgHrV6lcidHhB5_gtVEUx-D7mm8'
+SHEET_NAME = 'Fitness Tests Data'
 
 # authorization constants
 CLIENT_ID_FILE = 'credentials.json'
@@ -40,25 +41,28 @@ DOCS = discovery.build('docs', 'v1', http=HTTP)
 SHEETS = discovery.build('sheets', 'v4', http=HTTP)
 
 def get_data(source):
-    """Gets mail merge data from chosen data source.
+    """
+    Gets mail merge data from chosen data source.
     """
     if source not in {'sheets', 'text'}:
         raise ValueError(f'ERROR: unsupported source {source}; choose from {SOURCES}')
     return SAFE_DISPATCH[source]()
 
 def _get_sheets_data(service=SHEETS):
-    """(private) Returns data from Google Sheets source. It gets all rows of
-        'Fitness Tests Data' (the default Sheet in a new spreadsheet).
+    """
+    Returns data from Google Sheets source. It gets all rows of
+    SHEET_NAME (the default Sheet in a new spreadsheet).
     """
     return service.spreadsheets().values().get(spreadsheetId=SHEETS_FILE_ID,
-            range='Fitness Tests Data').execute().get('values')[:]
+            range=SHEET_NAME).execute().get('values')[:]
 
 # data source dispatch table [better alternative vs. eval()]
 SAFE_DISPATCH = {k: globals().get(f'_get_{k}_data') for k in SOURCES}
 
 def _copy_template(tmpl_id, source, service):
-    """Copies letter template document using Drive API then
-        returns file ID of (new) copy.
+    """
+    Copies letter template document using Drive API then
+    returns file ID of (new) copy.
     """
     # Name of the generated document
     doc_creation_time = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
@@ -67,8 +71,9 @@ def _copy_template(tmpl_id, source, service):
             fields='id').execute().get('id')
 
 def merge_template(merge, tmpl_id, source, service):
-    """Copies template document and merges data into newly-minted copy then
-        returns its file ID.
+    """
+    Copies template document and merges data into newly-minted copy then
+    returns its file ID.
     """
     # copy template and set context data struct for merging template values
     copy_id = _copy_template(tmpl_id, source, service)
@@ -90,10 +95,15 @@ def merge_template(merge, tmpl_id, source, service):
 
 if __name__ == '__main__':
     # get row data, then loop through & process each form letter
-    data = get_data(SOURCE) # get data from data source
+    data = get_data(source=SOURCE) # get data from data source
     headers = data[0]
     student_data = data[1:]
     for i, row in enumerate(student_data):
         merge = dict(zip(headers, row))
-        merged_doc_id = merge_template(merge, DOCS_FILE_ID, SOURCE, DRIVE)
+        merged_doc_id = merge_template(
+            merge=merge, 
+            tmpl_id=DOCS_FILE_ID, 
+            source=SOURCE, 
+            service=DRIVE
+        )
         print(f'Merged letter {i+1}: docs.google.com/document/d/{merged_doc_id}/edit')
