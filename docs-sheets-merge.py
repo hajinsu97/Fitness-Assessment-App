@@ -20,9 +20,6 @@ SCOPES = (  # iterable or space-delimited string
     'https://www.googleapis.com/auth/spreadsheets.readonly',
 )
 
-SOURCES = ('text', 'sheets')
-SOURCE = 'sheets' # Choose one of the data SOURCES
-
 def get_http_client():
     """Uses project credentials in CLIENT_ID_FILE along with requested OAuth2
         scopes for authorization, and caches API tokens in TOKEN_STORE_FILE.
