@@ -37,30 +37,43 @@ DRIVE = discovery.build('drive', 'v3', http=HTTP)
 DOCS = discovery.build('docs', 'v1', http=HTTP)
 SHEETS = discovery.build('sheets', 'v4', http=HTTP)
 
-def get_sheets_data():
+def get_sheets_data(service=SHEETS):
     """
     Returns data from Google Sheets source. It gets all rows of
     SHEET_NAME (the default Sheet in a new spreadsheet).
     """
-    return SHEETS.spreadsheets().values().get(spreadsheetId=SHEETS_FILE_ID,
+    return service.spreadsheets().values().get(spreadsheetId=SHEETS_FILE_ID,
             range=SHEET_NAME).execute().get('values')[:]
 
 def get_table():
     document = service.documents().get(documentId=DOCUMENT_ID).execute()
     table = document['body']['content'][2]
 
-def copy_template(tmpl_id):
+def copy_template(tmpl_id, service=DRIVE):
     """
     Copies letter template document using Drive API then
     returns file ID of (new) copy.
     """
-    # Name of the generated document
     doc_creation_time = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
-    body = {'name': f'KBBMA Fitness Assessments {doc_creation_time}'}
-    return DRIVE.files().copy(body=body, fileId=tmpl_id,
-            fields='id').execute().get('id')
+    copy_doc_name = {'name': f'KBBMA Fitness Assessments {doc_creation_time}'}
+    copy_doc_id = service.files().copy(body=copy_doc_name, fileId=tmpl_id, fields='id').execute().get('id')
+    return copy_doc_id
 
-def merge_template(merge, copy_doc_id):
+def append_template(tmpl_id, copy_doc_id, service=DOCS):
+    requests = [
+        {
+            'insertPageBreak': {
+                'endOfSegmentLocation': {
+                    "segmentId": ""
+                }
+            }
+        }
+    ]
+    requests.append(service.documents().get(documentId=tmpl_id).execute())
+    service.documents().batchUpdate(
+    documentId=copy_doc_id, body={'requests': requests}).execute()
+
+def merge_template(merge, copy_doc_id, service=DOCS):
     """
     Copies template document and merges data into newly-minted copy then
     returns its file ID.
@@ -68,7 +81,7 @@ def merge_template(merge, copy_doc_id):
     context = merge.iteritems() if hasattr({}, 'iteritems') else merge.items()
 
     # "search & replace" API requests for mail merge substitutions
-    reqs = [{'replaceAllText': {
+    requests = [{'replaceAllText': {
                 'containsText': {
                     'text': f'<{key}>' ,
                     'matchCase': False,
@@ -76,24 +89,32 @@ def merge_template(merge, copy_doc_id):
                 'replaceText': value,
             }} for key, value in context]
     # send requests to Docs API to do actual merge
-    DOCS.documents().batchUpdate(body={'requests': reqs},
+    service.documents().batchUpdate(body={'requests': requests},
             documentId=copy_doc_id, fields='').execute()
     return copy_doc_id
 
 
 if __name__ == '__main__':
     # get row data, then loop through & process each form letter
-    data = get_sheets_data() # get data from data source
+    data = get_sheets_data(service=SHEETS)
     headers = data[0]
     student_data = data[1:]
-
+    copy_doc_id = copy_template(
+        tmpl_id=DOCS_FILE_ID,
+        service=DRIVE
+    )
     for i, row in enumerate(student_data):
         merge = dict(zip(headers, row))
-        copy_doc_id = copy_template(
-            tmpl_id=DOCS_FILE_ID,
-        )
         merged_doc_id = merge_template(
-            merge=merge, 
+            merge=merge,
             copy_doc_id=copy_doc_id,
+            service=DOCS
         )
-        print(f'Merged letter {i+1}: docs.google.com/document/d/{merged_doc_id}/edit')
+        # if theres more students to create an assessment for
+        if i < len(student_data) - 1: # and next row is not the same student
+            append_template(
+                tmpl_id=DOCS_FILE_ID,
+                copy_doc_id=copy_doc_id,
+                service=DOCS
+            )
+    print(f'Merged letter {i+1}: docs.google.com/document/d/{merged_doc_id}/edit')
