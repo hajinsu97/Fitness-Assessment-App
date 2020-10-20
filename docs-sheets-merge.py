@@ -76,7 +76,7 @@ def merge_template(merge, copy_doc_id):
                 'replaceText': value,
             }} for key, value in context]
     # send requests to Docs API to do actual merge
-    service.documents().batchUpdate(body={'requests': reqs},
+    DOCS.documents().batchUpdate(body={'requests': reqs},
             documentId=copy_doc_id, fields='').execute()
     return copy_doc_id
 
