@@ -70,13 +70,11 @@ def copy_template(tmpl_id, source, service):
     return service.files().copy(body=body, fileId=tmpl_id,
             fields='id').execute().get('id')
 
-def merge_template(merge, tmpl_id, source, service):
+def merge_template(merge, copy_doc_id, service):
     """
     Copies template document and merges data into newly-minted copy then
     returns its file ID.
     """
-    # copy template and set context data struct for merging template values
-    copy_id = copy_template(tmpl_id, source, service)
     context = merge.iteritems() if hasattr({}, 'iteritems') else merge.items()
 
     # "search & replace" API requests for mail merge substitutions
@@ -88,9 +86,9 @@ def merge_template(merge, tmpl_id, source, service):
                 'replaceText': value,
             }} for key, value in context]
     # send requests to Docs API to do actual merge
-    DOCS.documents().batchUpdate(body={'requests': reqs},
-            documentId=copy_id, fields='').execute()
-    return copy_id
+    service.documents().batchUpdate(body={'requests': reqs},
+            documentId=copy_doc_id, fields='').execute()
+    return copy_doc_id
 
 
 if __name__ == '__main__':
@@ -98,12 +96,17 @@ if __name__ == '__main__':
     data = get_data(source=SOURCE) # get data from data source
     headers = data[0]
     student_data = data[1:]
+
     for i, row in enumerate(student_data):
         merge = dict(zip(headers, row))
+        copy_doc_id = copy_template(
+            tmpl_id=DOCS_FILE_ID,
+            source=SOURCE,
+            service=DRIVE
+        )
         merged_doc_id = merge_template(
             merge=merge, 
-            tmpl_id=DOCS_FILE_ID, 
-            source=SOURCE, 
-            service=DRIVE
+            copy_doc_id=copy_doc_id,
+            service=DOCS
         )
         print(f'Merged letter {i+1}: docs.google.com/document/d/{merged_doc_id}/edit')
