@@ -59,10 +59,7 @@ def _get_sheets_data(service=SHEETS):
     return service.spreadsheets().values().get(spreadsheetId=SHEETS_FILE_ID,
             range=SHEET_NAME).execute().get('values')[:]
 
-# data source dispatch table [better alternative vs. eval()]
-SAFE_DISPATCH = {k: globals().get(f'_get_{k}_data') for k in SOURCES}
-
-def _copy_template(tmpl_id, source, service):
+def copy_template(tmpl_id, source, service):
     """
     Copies letter template document using Drive API then
     returns file ID of (new) copy.
@@ -79,7 +76,7 @@ def merge_template(merge, tmpl_id, source, service):
     returns its file ID.
     """
     # copy template and set context data struct for merging template values
-    copy_id = _copy_template(tmpl_id, source, service)
+    copy_id = copy_template(tmpl_id, source, service)
     context = merge.iteritems() if hasattr({}, 'iteritems') else merge.items()
 
     # "search & replace" API requests for mail merge substitutions
