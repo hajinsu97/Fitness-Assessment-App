@@ -40,18 +40,7 @@ DRIVE = discovery.build('drive', 'v3', http=HTTP)
 DOCS = discovery.build('docs', 'v1', http=HTTP)
 SHEETS = discovery.build('sheets', 'v4', http=HTTP)
 
-# data source dispatch table [better alternative vs. eval()]
-SAFE_DISPATCH = {k: globals().get(f'_get_{k}_data') for k in SOURCES}
-
-def get_data(source):
-    """
-    Gets mail merge data from chosen data source.
-    """
-    if source not in {'sheets', 'text'}:
-        raise ValueError(f'ERROR: unsupported source {source}; choose from {SOURCES}')
-    return SAFE_DISPATCH[source]()
-
-def _get_sheets_data(service=SHEETS):
+def get_sheets_data():
     """
     Returns data from Google Sheets source. It gets all rows of
     SHEET_NAME (the default Sheet in a new spreadsheet).
