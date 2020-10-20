@@ -45,10 +45,14 @@ def get_sheets_data():
     Returns data from Google Sheets source. It gets all rows of
     SHEET_NAME (the default Sheet in a new spreadsheet).
     """
-    return service.spreadsheets().values().get(spreadsheetId=SHEETS_FILE_ID,
+    return SHEETS.spreadsheets().values().get(spreadsheetId=SHEETS_FILE_ID,
             range=SHEET_NAME).execute().get('values')[:]
 
-def copy_template(tmpl_id, source, service):
+def get_table():
+    document = service.documents().get(documentId=DOCUMENT_ID).execute()
+    table = document['body']['content'][2]
+
+def copy_template(tmpl_id):
     """
     Copies letter template document using Drive API then
     returns file ID of (new) copy.
@@ -56,10 +60,10 @@ def copy_template(tmpl_id, source, service):
     # Name of the generated document
     doc_creation_time = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
     body = {'name': f'KBBMA Fitness Assessments {doc_creation_time}'}
-    return service.files().copy(body=body, fileId=tmpl_id,
+    return DRIVE.files().copy(body=body, fileId=tmpl_id,
             fields='id').execute().get('id')
 
-def merge_template(merge, copy_doc_id, service):
+def merge_template(merge, copy_doc_id):
     """
     Copies template document and merges data into newly-minted copy then
     returns its file ID.
@@ -82,7 +86,7 @@ def merge_template(merge, copy_doc_id, service):
 
 if __name__ == '__main__':
     # get row data, then loop through & process each form letter
-    data = get_data(source=SOURCE) # get data from data source
+    data = get_sheets_data() # get data from data source
     headers = data[0]
     student_data = data[1:]
 
@@ -90,12 +94,9 @@ if __name__ == '__main__':
         merge = dict(zip(headers, row))
         copy_doc_id = copy_template(
             tmpl_id=DOCS_FILE_ID,
-            source=SOURCE,
-            service=DRIVE
         )
         merged_doc_id = merge_template(
             merge=merge, 
             copy_doc_id=copy_doc_id,
-            service=DOCS
         )
         print(f'Merged letter {i+1}: docs.google.com/document/d/{merged_doc_id}/edit')
