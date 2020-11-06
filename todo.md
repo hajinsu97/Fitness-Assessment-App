@@ -15,7 +15,6 @@ Next update:
 - Sort data by name and if name is different create a page break and start a new page
     - remove training whitespace and check if name is same with .no case
 
-# Local Testing
-```
-source env/bin/activate
-```
+
+
+doc_creation_time = datetime.today().strftime('%Y-%m-%d %H:%M:%S')

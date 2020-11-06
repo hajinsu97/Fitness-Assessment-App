@@ -50,13 +50,12 @@ def get_student_data():
     student_data_dict = [dict(zip(headers, student)) for student in student_data]
     return student_data_dict
 
-def copy_template(tmpl_id, service=DRIVE):
+def copy_template_doc(student_name, tmpl_id, service=DRIVE):
     """
     Copies letter template document using Drive API then
     returns file ID of (new) copy.
     """
-    doc_creation_time = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
-    copy_doc_name = {'name': f'KBBMA Fitness Assessments {doc_creation_time}'}
+    copy_doc_name = {'name': f'KBBMA Fitness Assessments - {student_name}'}
     copy_doc_id = service.files().copy(body=copy_doc_name, fileId=tmpl_id, fields='id').execute().get('id')
     return copy_doc_id
 
@@ -68,7 +67,7 @@ def append_template(tmpl_id, copy_doc_id, service=DOCS):
     requests.append(tmpl_body["body"]["content"])
     service.documents().batchUpdate(documentId=copy_doc_id, body={'requests': requests}).execute()
 
-def merge_template(merge, copy_doc_id, service=DOCS):
+def merge_student_data_to_template_doc(merge, copy_doc_id, service=DOCS):
     """
     Copies template document and merges data into newly-minted copy then
     returns its file ID.
@@ -91,13 +90,14 @@ def merge_template(merge, copy_doc_id, service=DOCS):
 
 if __name__ == '__main__':
     student_data = get_student_data()
-    for student in student_data:
-        copy_doc_id = copy_template(
+    for i, student in enumerate(student_data):
+        copy_doc_id = copy_template_doc(
+            student_name = student[STR_STUDENTS_NAME],
             tmpl_id=DOCS_FILE_ID,
             service=DRIVE
         )
 
-        merged_doc_id = merge_template(
+        merged_doc_id = merge_student_data_to_template_doc(
             merge=student,
             copy_doc_id=copy_doc_id,
             service=DOCS
