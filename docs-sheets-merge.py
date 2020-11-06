@@ -1,5 +1,6 @@
 from __future__ import print_function
 import time
+import json
 from datetime import datetime
 
 from googleapiclient import discovery
@@ -60,18 +61,12 @@ def copy_template(tmpl_id, service=DRIVE):
     return copy_doc_id
 
 def append_template(tmpl_id, copy_doc_id, service=DOCS):
-    requests = [
-        {
-            'insertPageBreak': {
-                'endOfSegmentLocation': {
-                    "segmentId": ""
-                }
-            }
-        }
-    ]
-    requests.append(service.documents().get(documentId=tmpl_id).execute())
-    service.documents().batchUpdate(
-    documentId=copy_doc_id, body={'requests': requests}).execute()
+    cdoc = service.openById
+    body = doc.getBody()
+    tmpl_body = service.documents().get(documentId=tmpl_id).execute()
+    print(tmpl_body["body"]["content"])
+    requests.append(tmpl_body["body"]["content"])
+    service.documents().batchUpdate(documentId=copy_doc_id, body={'requests': requests}).execute()
 
 def merge_template(merge, copy_doc_id, service=DOCS):
     """
@@ -99,22 +94,23 @@ if __name__ == '__main__':
     data = get_sheets_data(service=SHEETS)
     headers = data[0]
     student_data = data[1:]
-    copy_doc_id = copy_template(
-        tmpl_id=DOCS_FILE_ID,
-        service=DRIVE
-    )
     for i, row in enumerate(student_data):
+        copy_doc_id = copy_template(
+            tmpl_id=DOCS_FILE_ID,
+            service=DRIVE
+        )
+
         merge = dict(zip(headers, row))
         merged_doc_id = merge_template(
             merge=merge,
             copy_doc_id=copy_doc_id,
             service=DOCS
         )
-        # if theres more students to create an assessment for
-        if i < len(student_data) - 1: # and next row is not the same student
-            append_template(
-                tmpl_id=DOCS_FILE_ID,
-                copy_doc_id=copy_doc_id,
-                service=DOCS
-            )
-    print(f'Merged letter {i+1}: docs.google.com/document/d/{merged_doc_id}/edit')
+        # # if theres more students to create an assessment for
+        # if i < len(student_data) - 1: # and next row is not the same student
+        #     append_template(
+        #         tmpl_id=DOCS_FILE_ID,
+        #         copy_doc_id=copy_doc_id,
+        #         service=DOCS
+        #     )
+        print(f'Merged letter {i+1}: docs.google.com/document/d/{merged_doc_id}/edit')
