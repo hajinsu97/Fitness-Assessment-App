@@ -50,6 +50,18 @@ def get_table():
     document = service.documents().get(documentId=DOCUMENT_ID).execute()
     table = document['body']['content'][2]
 
+def get_student_data():
+    """
+    Returns the student data as a list of dicts where each dict
+    represents a student (a row from the sheet). Keys are the headings
+    of the columns and values are the students' data in that column.
+    """
+    data = get_sheets_data(service=SHEETS)
+    headers = data[0]
+    student_data = data[1:]
+    student_data_dict = [dict(zip(headers, student)) for student in student_data]
+    return student_data_dict
+
 def copy_template(tmpl_id, service=DRIVE):
     """
     Copies letter template document using Drive API then
@@ -90,19 +102,15 @@ def merge_template(merge, copy_doc_id, service=DOCS):
 
 
 if __name__ == '__main__':
-    # get row data, then loop through & process each form letter
-    data = get_sheets_data(service=SHEETS)
-    headers = data[0]
-    student_data = data[1:]
-    for i, row in enumerate(student_data):
+    student_data = get_student_data()
+    for student in student_data:
         copy_doc_id = copy_template(
             tmpl_id=DOCS_FILE_ID,
             service=DRIVE
         )
 
-        merge = dict(zip(headers, row))
         merged_doc_id = merge_template(
-            merge=merge,
+            merge=student,
             copy_doc_id=copy_doc_id,
             service=DOCS
         )
