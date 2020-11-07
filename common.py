@@ -12,5 +12,5 @@ SCOPES = (  # iterable or space-delimited string
     'https://www.googleapis.com/auth/spreadsheets.readonly',
 )
 
-# Headers in Student data
+# Assessment questions used in Google Form
 STR_STUDENTS_NAME = "Student's Name"

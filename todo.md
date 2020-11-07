@@ -2,7 +2,6 @@
 Featurees
 - In the table, each column by month
 - 1 sheet has all the data but columns filtered by date
-- Name of doc student name
 
 Next update:
  - one doc each page by student name
@@ -14,6 +13,11 @@ Next update:
 - Autoformat timestamp in google sheets
 - Sort data by name and if name is different create a page break and start a new page
     - remove training whitespace and check if name is same with .no case
+- optimize get_student_data generating dictionary, searching student, consider making an object (is this more efficient?)
+- better comments
+- type hinting
+- unit tests
+
 
 
 
