@@ -3,6 +3,7 @@ Featurees
 - In the table, each column by month
 - 1 sheet has all the data but columns filtered by date
 - Name of doc student name
+- Flexibility
 
 Next update:
  - one doc each page by student name

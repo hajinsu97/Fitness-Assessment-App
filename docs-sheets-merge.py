@@ -9,22 +9,9 @@ from oauth2client import file, client, tools
 
 from common import *
 
-def get_http_client():
-    """Uses project credentials in CLIENT_ID_FILE along with requested OAuth2
-        scopes for authorization, and caches API tokens in TOKEN_STORE_FILE.
-    """
-    store = file.Storage(TOKEN_STORE_FILE)
-    creds = store.get()
-    if not creds or creds.invalid:
-        flow = client.flow_from_clientsecrets(CLIENT_ID_FILE, SCOPES)
-        creds = tools.run_flow(flow, store)
-    return creds.authorize(Http())
-
-# Service endpoints to Google APIs
-HTTP = get_http_client()
-DRIVE = discovery.build('drive', 'v3', http=HTTP)
-DOCS = discovery.build('docs', 'v1', http=HTTP)
-SHEETS = discovery.build('sheets', 'v4', http=HTTP)
+# def get_table():
+#     document = service.documents().get(documentId=DOCUMENT_ID).execute()
+#     table = document['body']['content'][2]
 
 def get_sheets_data(service=SHEETS):
     """
@@ -33,10 +20,6 @@ def get_sheets_data(service=SHEETS):
     """
     return service.spreadsheets().values().get(spreadsheetId=SHEETS_FILE_ID,
             range=SHEET_NAME).execute().get('values')[:]
-
-def get_table():
-    document = service.documents().get(documentId=DOCUMENT_ID).execute()
-    table = document['body']['content'][2]
 
 def get_student_data():
     """
@@ -60,6 +43,9 @@ def copy_template_doc(student_name, tmpl_id, service=DRIVE):
     return copy_doc_id
 
 def append_template(tmpl_id, copy_doc_id, service=DOCS):
+    """
+    Append a template to google doc
+    """
     cdoc = service.openById
     body = doc.getBody()
     tmpl_body = service.documents().get(documentId=tmpl_id).execute()

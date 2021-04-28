@@ -14,3 +14,20 @@ SCOPES = (  # iterable or space-delimited string
 
 # Headers in Student data
 STR_STUDENTS_NAME = "Student's Name"
+
+def get_http_client():
+    """Uses project credentials in CLIENT_ID_FILE along with requested OAuth2
+        scopes for authorization, and caches API tokens in TOKEN_STORE_FILE.
+    """
+    store = file.Storage(TOKEN_STORE_FILE)
+    creds = store.get()
+    if not creds or creds.invalid:
+        flow = client.flow_from_clientsecrets(CLIENT_ID_FILE, SCOPES)
+        creds = tools.run_flow(flow, store)
+    return creds.authorize(Http())
+
+# Service endpoints to Google APIs
+HTTP = get_http_client()
+DRIVE = discovery.build('drive', 'v3', http=HTTP)
+DOCS = discovery.build('docs', 'v1', http=HTTP)
+SHEETS = discovery.build('sheets', 'v4', http=HTTP)
