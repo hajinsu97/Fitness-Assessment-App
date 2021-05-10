@@ -3,10 +3,6 @@ import time
 import json
 from datetime import datetime
 
-from googleapiclient import discovery
-from httplib2 import Http
-from oauth2client import file, client, tools
-
 from common import *
 
 # def get_table():

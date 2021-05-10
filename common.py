@@ -1,3 +1,7 @@
+from googleapiclient import discovery
+from httplib2 import Http
+from oauth2client import file, client, tools
+
 # Fill-in IDs of your Docs template & any Sheets data source
 DOCS_FILE_ID = '1JfYsCbmk1uTGrgC15OFubSjPbbD0hopqv4d0xwOyzOM'
 SHEETS_FILE_ID = '1yJ7IM1NaNHq2xm7zPgHrV6lcidHhB5_gtVEUx-D7mm8'
