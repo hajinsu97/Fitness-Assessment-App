@@ -6,12 +6,9 @@ Example Google Doc template: https://docs.google.com/document/d/1JfYsCbmk1uTGrgC
 
 # Local Testing
 ```
-source env/bin/activate
+source fitness-app/bin/activate
+python docs-sheets-merge.py
 ```
-
-# Todo
-1. Auto create rows and columns in table
-2. Create a line graph
 
 # Examples
 ![image](https://user-images.githubusercontent.com/70655743/120419803-1fd81200-c331-11eb-9a71-23aa430653e1.png)
