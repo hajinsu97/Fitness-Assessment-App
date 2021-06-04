@@ -4,6 +4,10 @@ A fitness app that merges data from a Google Sheet into a Google Doc.
 
 Example Google Doc template: https://docs.google.com/document/d/1JfYsCbmk1uTGrgC15OFubSjPbbD0hopqv4d0xwOyzOM/edit?usp=sharing
 
+# Goal
+Monitor athletes to maximise the positive effects (eg, fitness, readiness and performance) and minimise the negative effects (eg, excessive fatigue, injury and illness) of training
+- ideal performance test and workload ‘metric’ should be sport-specific
+
 # Local Testing
 ```
 source env/bin/activate
