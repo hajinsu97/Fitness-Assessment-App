@@ -17,6 +17,7 @@ Next update:
 - Create a line graph
 - Score based on average - Colour box to indicate NI, Above Avg, Avg, etc.
 - Python app to auto add new active students and cleanup inactive students
+- strength & weaknesses compared to national avg
 - Autoformat timestamp in google sheets
 
 
