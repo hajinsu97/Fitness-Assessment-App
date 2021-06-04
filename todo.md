@@ -12,6 +12,7 @@ Next update:
  - Create one google doc with line breaks
     - Copy the template with a page break each time
     - replace the values after copying template
+- strength & weaknesses compared to national avg
 - Autoformat timestamp in google sheets
 - Sort data by name and if name is different create a page break and start a new page
     - remove training whitespace and check if name is same with .no case
