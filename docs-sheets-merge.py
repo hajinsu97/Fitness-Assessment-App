@@ -7,6 +7,7 @@ from common import *
 from student import Student
 
 students_list = []
+headers = []
 
 # def get_table():
 #     document = service.documents().get(documentId=DOCUMENT_ID).execute()
@@ -41,9 +42,9 @@ def initialize_student_data():
         name = data.pop(STR_STUDENTS_NAME)
         student = find_student(name)
         if student is None:
-            students_list.append(Student(name))
+            students_list.append(Student(name, data))
         else:
-            student.add_data(data)
+            student.insert_data(data)
 
 
 def find_student(name: str) -> Student:
@@ -84,7 +85,7 @@ def append_template(tmpl_id, copy_doc_id, service=DOCS):
     ).execute()
 
 
-def merge_student_data_to_template_doc(merge, copy_doc_id, service=DOCS):
+def merge_student_data_to_doc(merge, copy_doc_id, service=DOCS):
     """
     Copies template document and merges data into newly-minted copy then
     returns its file ID.
@@ -114,14 +115,14 @@ def merge_student_data_to_template_doc(merge, copy_doc_id, service=DOCS):
 if __name__ == "__main__":
     initialize_student_data()
     for student in students_list:
-        print(f"{student.name} -- {student.data}")
+        print(f"{student.name} -- {student.data_list}")
         # copy_doc_id = copy_template_doc(
         #     student_name = student[STR_STUDENTS_NAME],
         #     tmpl_id=DOCS_FILE_ID,
         #     service=DRIVE
         # )
 
-        # merged_doc_id = merge_student_data_to_template_doc(
+        # merged_doc_id = merge_student_data_to_doc(
         #     merge=student,
         #     copy_doc_id=copy_doc_id,
         #     service=DOCS
