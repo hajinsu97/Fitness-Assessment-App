@@ -8,6 +8,10 @@ Example Google Doc template: https://docs.google.com/document/d/1JfYsCbmk1uTGrgC
 Monitor athletes to maximise the positive effects (eg, fitness, readiness and performance) and minimise the negative effects (eg, excessive fatigue, injury and illness) of training
 - ideal performance test and workload ‘metric’ should be sport-specific
 
+# Metric Ideas
+- Block speed (cm/s) - time = # frames/framerate -> speed = distance/time
+- Endurance - Skipping rope doubles
+
 # Local Testing
 ```
 cd ../KBBMA-Fitness-App/
