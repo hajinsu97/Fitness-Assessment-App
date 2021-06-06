@@ -9,44 +9,29 @@ from common import *
 from athlete import Athlete
 
 
-# def get_table():
-#     document = service.documents().get(documentId=DOCUMENT_ID).execute()
-#     table = document['body']['content'][2]
-
-
-def get_sheets_data(service=SHEETS):
+def extract_athletes_data_from_sheets(sheets_id, sheet_name, service=SHEETS):
     """
-    Returns data from Google Sheets source. It gets all rows of
-    SHEET_NAME (the default Sheet in a new spreadsheet).
+    Returns the athlete data from the given Google Sheet as a list of Athletes.
     """
-    return (
+    sheets_data = (
         service.spreadsheets()
         .values()
-        .get(spreadsheetId=SHEETS_FILE_ID, range=SHEET_NAME)
+        .get(spreadsheetId=sheets_id, range=sheet_name)
         .execute()
         .get("values")[:]
     )
-
-
-def extract_athletes_data_from_sheets():
-    """
-    Returns the athlete data as a list of dicts where each dict
-    represents a athlete (a row from the sheet). Keys are the headings
-    of the columns and values are the athletes' data in that column.
-    """
-    sheets_data = get_sheets_data(service=SHEETS)
     headers = sheets_data[0]
     athletes_data = sheets_data[1:]
     athletes_list = []
 
     for row in athletes_data:
-        data = dict(zip(headers, row))
-        name = data.pop(STR_NAME)
+        results = dict(zip(headers, row))
+        name = results.pop(STR_NAME)
         athlete = find_athlete(name, athletes_list)
         if athlete is None:
-            athletes_list.append(Athlete(name, data))
+            athletes_list.append(Athlete(name, results))
         else:
-            athlete.insert_data(data)
+            athlete.add_results(results)
 
     headers.remove(STR_DATE)
     headers.remove(STR_NAME)
@@ -63,15 +48,15 @@ def find_athlete(name: str, athletes_list) -> Athlete:
     return found_athlete
 
 
-def copy_template_doc(athlete_name, service=DRIVE):
+def copy_template_doc(athlete_name, docs_id, service=DRIVE):
     """
     Copies letter template document using Drive API then
     returns file ID of (new) copy.
     """
-    copy_doc_name = {"name": f"KBBMA Fitness Assessments - {athlete_name}"}
+    copy_doc_name = {"name": f"KBBMA Fitness Assessment - {athlete_name}"}
     copy_doc_id = (
         service.files()
-        .copy(body=copy_doc_name, fileId=DOCS_FILE_ID, fields="id")
+        .copy(body=copy_doc_name, fileId=docs_id, fields="id")
         .execute()
         .get("id")
     )
@@ -119,8 +104,9 @@ def create_table_in_doc(athlete, headers, doc_id):
     """
     values = [[""] + headers]
 
-    for data in athlete.data_list:
-        values.append(list(data.values()))
+    # Transpose the results
+    for result in athlete.results_list:
+        values.append(list(result.values()))
     values = list(map(list, zip_longest(*values, fillvalue="")))
 
     resource = {
@@ -133,9 +119,15 @@ def create_table_in_doc(athlete, headers, doc_id):
 
 
 if __name__ == "__main__":
-    headers, athletes_list = extract_athletes_data_from_sheets()
+    tmpl_doc_id = "1JfYsCbmk1uTGrgC15OFubSjPbbD0hopqv4d0xwOyzOM"
+    sheets_id = "1yJ7IM1NaNHq2xm7zPgHrV6lcidHhB5_gtVEUx-D7mm8"
+    sheet_name = "Fitness Tests Data"
+
+    headers, athletes_list = extract_athletes_data_from_sheets(
+        sheets_id=sheets_id, sheet_name=sheet_name
+    )
     for athlete in athletes_list:
-        copy_doc_id = copy_template_doc(athlete_name=athlete.name)
+        copy_doc_id = copy_template_doc(athlete_name=athlete.name, docs_id=tmpl_doc_id)
 
         requests = []
         requests.append(replace_variables_in_doc(merge={STR_NAME: athlete.name}))

@@ -1,11 +1,10 @@
 from common import *
-from datetime import datetime
 
 
 class Athlete:
-    def __init__(self, name: str, data):
+    def __init__(self, name: str, results):
         self.name = name
-        self.data_list = [data]
+        self.results_list = [results]
 
-    def insert_data(self, new_data):
-        self.data_list.append(new_data)
+    def add_results(self, new_results):
+        self.results_list.append(new_results)

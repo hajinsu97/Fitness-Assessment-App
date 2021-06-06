@@ -12,7 +12,7 @@ Monitor athletes to maximise the positive effects (eg, fitness, readiness and pe
 ```
 cd ../KBBMA-Fitness-App/
 source fitness-app/bin/activate
-python docs-sheets-merge.py
+python fitness-assessment-app.py
 ```
 
 # Examples
