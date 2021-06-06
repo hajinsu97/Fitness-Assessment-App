@@ -1,13 +1,13 @@
 from __future__ import print_function
 import time
 import json
-from datetime import datetime
+from itertools import zip_longest
+from gdoctableapppy import gdoctableapp
+
 
 from common import *
-from student import Student
+from athlete import Athlete
 
-students_list = []
-headers = []
 
 # def get_table():
 #     document = service.documents().get(documentId=DOCUMENT_ID).execute()
@@ -28,67 +28,72 @@ def get_sheets_data(service=SHEETS):
     )
 
 
-def initialize_student_data():
+def extract_athletes_data_from_sheets():
     """
-    Returns the student data as a list of dicts where each dict
-    represents a student (a row from the sheet). Keys are the headings
-    of the columns and values are the students' data in that column.
+    Returns the athlete data as a list of dicts where each dict
+    represents a athlete (a row from the sheet). Keys are the headings
+    of the columns and values are the athletes' data in that column.
     """
     sheets_data = get_sheets_data(service=SHEETS)
     headers = sheets_data[0]
-    students_data = sheets_data[1:]
-    for row in students_data:
+    athletes_data = sheets_data[1:]
+    athletes_list = []
+
+    for row in athletes_data:
         data = dict(zip(headers, row))
-        name = data.pop(STR_STUDENTS_NAME)
-        student = find_student(name)
-        if student is None:
-            students_list.append(Student(name, data))
+        name = data.pop(STR_NAME)
+        athlete = find_athlete(name, athletes_list)
+        if athlete is None:
+            athletes_list.append(Athlete(name, data))
         else:
-            student.insert_data(data)
+            athlete.insert_data(data)
+
+    headers.remove(STR_DATE)
+    headers.remove(STR_NAME)
+
+    return headers, athletes_list
 
 
-def find_student(name: str) -> Student:
-    found_student = None
-    for student in students_list:
-        if name == student.name:
-            found_student = student
+def find_athlete(name: str, athletes_list) -> Athlete:
+    found_athlete = None
+    for athlete in athletes_list:
+        if name == athlete.name:
+            found_athlete = athlete
             break
-    return found_student
+    return found_athlete
 
 
-def copy_template_doc(student_name, tmpl_id, service=DRIVE):
+def copy_template_doc(athlete_name, service=DRIVE):
     """
     Copies letter template document using Drive API then
     returns file ID of (new) copy.
     """
-    copy_doc_name = {"name": f"KBBMA Fitness Assessments - {student_name}"}
+    copy_doc_name = {"name": f"KBBMA Fitness Assessments - {athlete_name}"}
     copy_doc_id = (
         service.files()
-        .copy(body=copy_doc_name, fileId=tmpl_id, fields="id")
+        .copy(body=copy_doc_name, fileId=DOCS_FILE_ID, fields="id")
         .execute()
         .get("id")
     )
     return copy_doc_id
 
 
-def append_template(tmpl_id, copy_doc_id, service=DOCS):
-    """
-    Append a template to google doc
-    """
-    cdoc = service.openById
-    body = doc.getBody()
-    tmpl_body = service.documents().get(documentId=tmpl_id).execute()
-    print(tmpl_body["body"]["content"])
-    requests.append(tmpl_body["body"]["content"])
-    service.documents().batchUpdate(
-        documentId=copy_doc_id, body={"requests": requests}
-    ).execute()
+# def append_template(copy_doc_id, requests, service=DOCS):
+#     """
+#     Append a template to google doc.
+#     """
+#     cdoc = service.openById
+#     body = doc.getBody()
+#     tmpl_body = service.documents().get(documentId=DOCS_FILE_ID).execute()
+#     print(tmpl_body["body"]["content"])
+#     requests.append(tmpl_body["body"]["content"])
+#     return requests
 
 
-def merge_student_data_to_doc(merge, copy_doc_id, service=DOCS):
+def replace_variables_in_doc(merge):
     """
-    Copies template document and merges data into newly-minted copy then
-    returns its file ID.
+    Replaces all instances of each key in merge with its value
+    in the Google Doc.
     """
     context = merge.iteritems() if hasattr({}, "iteritems") else merge.items()
 
@@ -105,33 +110,37 @@ def merge_student_data_to_doc(merge, copy_doc_id, service=DOCS):
         }
         for key, value in context
     ]
-    # send requests to Docs API to do actual merge
-    service.documents().batchUpdate(
-        body={"requests": requests}, documentId=copy_doc_id, fields=""
-    ).execute()
-    return copy_doc_id
+    return requests
+
+
+def create_table_in_doc(athlete, headers, doc_id):
+    """
+    Add the athlete's data to the table in the Google Doc.
+    """
+    values = [[""] + headers]
+
+    for data in athlete.data_list:
+        values.append(list(data.values()))
+    values = list(map(list, zip_longest(*values, fillvalue="")))
+
+    resource = {
+        "oauth2": CREDS,
+        "documentId": doc_id,
+        "tableIndex": 0,
+        "values": values,
+    }
+    gdoctableapp.SetValues(resource)
 
 
 if __name__ == "__main__":
-    initialize_student_data()
-    for student in students_list:
-        print(f"{student.name} -- {student.data_list}")
-        # copy_doc_id = copy_template_doc(
-        #     student_name = student[STR_STUDENTS_NAME],
-        #     tmpl_id=DOCS_FILE_ID,
-        #     service=DRIVE
-        # )
+    headers, athletes_list = extract_athletes_data_from_sheets()
+    for athlete in athletes_list:
+        copy_doc_id = copy_template_doc(athlete_name=athlete.name)
 
-        # merged_doc_id = merge_student_data_to_doc(
-        #     merge=student,
-        #     copy_doc_id=copy_doc_id,
-        #     service=DOCS
-        # )
-        # # if theres more students to create an assessment for
-        # if i < len(student_data) - 1: # and next row is not the same student
-        #     append_template(
-        #         tmpl_id=DOCS_FILE_ID,
-        #         copy_doc_id=copy_doc_id,
-        #         service=DOCS
-        #     )
-        # print(f'Merged letter {i+1}: docs.google.com/document/d/{merged_doc_id}/edit')
+        requests = []
+        requests.append(replace_variables_in_doc(merge={STR_NAME: athlete.name}))
+        create_table_in_doc(athlete, headers, copy_doc_id)
+
+        DOCS.documents().batchUpdate(
+            documentId=copy_doc_id, body={"requests": requests}
+        ).execute()

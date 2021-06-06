@@ -2,7 +2,7 @@ from common import *
 from datetime import datetime
 
 
-class Student:
+class Athlete:
     def __init__(self, name: str, data):
         self.name = name
         self.data_list = [data]

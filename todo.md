@@ -2,9 +2,9 @@
 Featurees
 - In the table, each row by month
     - Auto create rows and columns in table
-    - If 1 student has data for May-Jul and another has June-Sept
+    - If 1 athlete has data for May-Jul and another has June-Sept
 - 1 sheet has all the data but columns filtered by date
-- Name of doc student name
+- Name of doc athlete name
 - Authentication for other accounts
 - Create a folder
 
@@ -16,7 +16,7 @@ Next update:
     - replace the values after copying template
 - Create a line graph
 - Score based on average - Colour box to indicate NI, Above Avg, Avg, etc.
-- Python app to auto add new active students and cleanup inactive students
+- Python app to auto add new active athletes and cleanup inactive athletes
 - strength & weaknesses compared to national avg
 - Autoformat timestamp in google sheets
 
