@@ -1,4 +1,4 @@
-# KBBMA Fitness App
+# Fitness Assessment App
 
 A fitness app that merges data from a Google Sheet into a Google Doc.
 
