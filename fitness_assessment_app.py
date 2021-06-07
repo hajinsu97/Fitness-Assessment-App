@@ -3,7 +3,8 @@ import time
 import json
 from itertools import zip_longest
 from gdoctableapppy import gdoctableapp
-
+import chartify
+from mimetypes import MimeTypes
 
 from common import *
 from athlete import Athlete
@@ -48,15 +49,18 @@ def find_athlete(name: str, athletes_list) -> Athlete:
     return found_athlete
 
 
-def copy_template_doc(athlete_name, docs_id, service=DRIVE):
+def get_copy_doc_name(athlete_name):
+    return f"KBBMA Fitness Assessment - {athlete_name}"
+
+
+def copy_template_doc(copy_doc_name, docs_id, service=DRIVE):
     """
     Copies letter template document using Drive API then
     returns file ID of (new) copy.
     """
-    copy_doc_name = {"name": f"KBBMA Fitness Assessment - {athlete_name}"}
     copy_doc_id = (
         service.files()
-        .copy(body=copy_doc_name, fileId=docs_id, fields="id")
+        .copy(body={"name": copy_doc_name}, fileId=docs_id, fields="id")
         .execute()
         .get("id")
     )
@@ -118,7 +122,37 @@ def create_table_in_doc(athlete, headers, doc_id):
     gdoctableapp.SetValues(resource)
 
 
-if __name__ == "__main__":
+def make_url(mime_type, bin_data):
+    return "data:" + mime_type + ";base64, " + bin_data
+
+
+def create_chart():
+    ch = chartify.Chart()
+    ch.save("monthly_trends.html", format="html")
+
+    mime = MimeTypes()
+    your_files_mimetype = mime.guess_type("monthly_trends.html")[0]  # 3 returns a tuple
+
+    with open("monthly_trends.html", "rb") as f:
+        data = f.read()
+        url = make_url(your_files_mimetype, data)
+
+    requests = [
+        {
+            "insertInlineImage": {
+                "location": {"index": 1},
+                "uri": url,
+                "objectSize": {
+                    "height": {"magnitude": 50, "unit": "PT"},
+                    "width": {"magnitude": 50, "unit": "PT"},
+                },
+            }
+        }
+    ]  # Execute the request.
+
+
+def generate_reports(tmpl_doc_id, sheets_id, sheet_name):
+    reports = []
     tmpl_doc_id = "1JfYsCbmk1uTGrgC15OFubSjPbbD0hopqv4d0xwOyzOM"
     sheets_id = "1yJ7IM1NaNHq2xm7zPgHrV6lcidHhB5_gtVEUx-D7mm8"
     sheet_name = "Fitness Tests Data"
@@ -126,8 +160,12 @@ if __name__ == "__main__":
     headers, athletes_list = extract_athletes_data_from_sheets(
         sheets_id=sheets_id, sheet_name=sheet_name
     )
+
     for athlete in athletes_list:
-        copy_doc_id = copy_template_doc(athlete_name=athlete.name, docs_id=tmpl_doc_id)
+        copy_doc_name = get_copy_doc_name(athlete.name)
+        copy_doc_id = copy_template_doc(
+            copy_doc_name=copy_doc_name, docs_id=tmpl_doc_id
+        )
 
         requests = []
         requests.append(replace_variables_in_doc(merge={STR_NAME: athlete.name}))
@@ -136,3 +174,7 @@ if __name__ == "__main__":
         DOCS.documents().batchUpdate(
             documentId=copy_doc_id, body={"requests": requests}
         ).execute()
+
+        reports.append((copy_doc_name, copy_doc_id))
+        break
+    return reports
