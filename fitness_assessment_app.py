@@ -153,9 +153,6 @@ def create_chart():
 
 def generate_reports(tmpl_doc_id, sheets_id, sheet_name):
     reports = []
-    tmpl_doc_id = "1JfYsCbmk1uTGrgC15OFubSjPbbD0hopqv4d0xwOyzOM"
-    sheets_id = "1yJ7IM1NaNHq2xm7zPgHrV6lcidHhB5_gtVEUx-D7mm8"
-    sheet_name = "Fitness Tests Data"
 
     headers, athletes_list = extract_athletes_data_from_sheets(
         sheets_id=sheets_id, sheet_name=sheet_name
