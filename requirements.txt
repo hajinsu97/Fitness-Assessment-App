@@ -8,6 +8,7 @@ chardet==4.0.0
 chartify==3.0.3
 click==8.0.1
 decorator==5.0.9
+Flask==2.0.1
 gdoctableapppy==1.1.0
 google-api-core==1.29.0
 google-api-python-client==2.7.0
@@ -19,6 +20,7 @@ idna==2.10
 ipykernel==5.5.5
 ipython==7.24.1
 ipython-genutils==0.2.0
+itsdangerous==2.0.1
 jedi==0.18.0
 Jinja2==3.0.1
 jupyter-client==6.1.12
@@ -59,4 +61,4 @@ typing-extensions==3.10.0.0
 uritemplate==3.0.1
 urllib3==1.26.5
 wcwidth==0.2.5
-Flask==1.1.2
+Werkzeug==2.0.1

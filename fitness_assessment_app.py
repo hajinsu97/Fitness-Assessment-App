@@ -1,6 +1,4 @@
 from __future__ import print_function
-import time
-import json
 from itertools import zip_longest
 from gdoctableapppy import gdoctableapp
 import chartify
@@ -173,5 +171,4 @@ def generate_reports(tmpl_doc_id, sheets_id, sheet_name):
         ).execute()
 
         reports.append((copy_doc_name, copy_doc_id))
-        break
     return reports

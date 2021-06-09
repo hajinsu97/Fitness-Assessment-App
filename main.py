@@ -28,12 +28,12 @@ def index():
         docs = generate_reports(doc_id, sheets_id, sheets_name)
         html = ""
         for (doc_name, doc_id) in docs:
-            html += f'<a href="{get_doc_url_from_id(doc_id)}">{doc_name}</a>'
+            html += f'<a href="{get_doc_url_from_id(doc_id)}">{doc_name}</a><br>'
         return html
     return """<form action="" method="get">
-                Google Doc URL: <input type="text" name="doc_url">
-                Google Sheets URL: <input type="text" name="sheets_url">
-                Google Sheets Name: <input type="text" name="sheets_name">
+                Google Doc URL: <input type="text" name="doc_url"><br>
+                Google Sheets URL: <input type="text" name="sheets_url"><br>
+                Google Sheets Name: <input type="text" name="sheets_name"><br>
                 <input type="submit" value="Generate Reports">
               </form>"""
 

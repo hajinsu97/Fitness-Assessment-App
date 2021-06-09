@@ -1,9 +1,13 @@
 # TO DO
 Featurees
-- Authentication for other accounts
-- set the google doc id, sheet id, sheet name on runtime
+- Authentication for other accounts does it work?
+- Instructions on home page - make it so someone can use it without any help
+    - example doc
+    - example sheet
+- Nice HTML -> use a template
 
 Next update:
+- Heroku vs Google Cloud - price?
 - Create a line graph
 - Divide HighPerformance and Regular students
     - HP: Recognized & Freestyle
