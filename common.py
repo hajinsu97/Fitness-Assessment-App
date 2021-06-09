@@ -8,7 +8,7 @@ STR_NAME = "Name"
 STR_DATE = "Date"
 
 # Authorization constants
-CLIENT_ID_FILE = "credentials.json"
+CLIENT_ID_FILE = "google-credentials.json"
 TOKEN_STORE_FILE = "token.json"
 SCOPES = (  # iterable or space-delimited string
     "https://www.googleapis.com/auth/drive",
