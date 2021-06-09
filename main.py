@@ -1,8 +1,7 @@
-from flask import Flask
-from flask import request, escape
-from flask.globals import g
+from flask import Flask, request, escape
 from fitness_assessment_app import generate_reports
 import re
+import os
 
 app = Flask(__name__)
 
@@ -39,4 +38,4 @@ def index():
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(port=int(os.environ.get("PORT", 5000)), host="0.0.0.0")

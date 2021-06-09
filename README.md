@@ -8,7 +8,7 @@ Example Google Doc template: https://docs.google.com/document/d/1JfYsCbmk1uTGrgC
 ```
 cd ../KBBMA-Fitness-App/
 source fitness-app/bin/activate
-python main.py
+heroku local
 
 http://127.0.0.1:8080/?doc_url=https%3A%2F%2Fdocs.google.com%2Fdocument%2Fd%2F1JfYsCbmk1uTGrgC15OFubSjPbbD0hopqv4d0xwOyzOM%2Fedit%3Fusp%3Dsharing&sheets_url=https%3A%2F%2Fdocs.google.com%2Fspreadsheets%2Fd%2F1yJ7IM1NaNHq2xm7zPgHrV6lcidHhB5_gtVEUx-D7mm8%2Fedit%3Fusp%3Dsharing&sheets_name=2021
 
@@ -17,7 +17,7 @@ http://127.0.0.1:8080/?doc_url=https%3A%2F%2Fdocs.google.com%2Fdocument%2Fd%2F1J
 ## App Deployment
 ```
 pip3 freeze > requirements.txt
-gcloud app deploy
+git push heroku main
 ```
 
 ## Goal
