@@ -2,6 +2,7 @@ from flask import Flask, request, escape
 from fitness_assessment_app import generate_reports
 import re
 import os
+import argparse
 
 app = Flask(__name__)
 
@@ -38,4 +39,6 @@ def index():
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    args, unknown = parser.parse_known_args()
     app.run()
