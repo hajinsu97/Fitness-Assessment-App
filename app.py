@@ -13,14 +13,14 @@ from googleapiclient.discovery import build
 
 # Internal imports
 from config import *
-from user import *
+from models import *
 from fitness_assessment_app import generate_reports
 
 
 # Flask-Login helper to retrieve a user from our db
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.filter_by(_id=user_id).first()
+    return User.query.filter_by(id=user_id).first()
 
 
 def get_file_id_from_url(url: str) -> str:
@@ -112,12 +112,11 @@ def callback():
 
     # Doesn't exist? Add it to the database.
     user = User(
-        _id=user_info["id"],
+        id=user_info["id"],
         name=user_info["email"],
         email=user_info["given_name"],
         profile_pic=user_info["picture"],
     )
-    create_user(user)
 
     # Begin user session by logging the user in
     login_user(user)

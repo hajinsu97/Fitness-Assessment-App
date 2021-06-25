@@ -22,6 +22,21 @@ pip3 freeze > requirements.txt
 git push heroku main
 ```
 
+## Database
+```
+heroku pg:psql
+
+# Fresh Database
+drop schema public cascade;
+create schema public;
+grant all on schema public to postgres;
+grant all on schema public to public;
+
+python manage.py db init
+python manage.py db migrate
+python manage.py db upgrade
+```
+
 ## Goal
 Monitor athletes to maximise the positive effects (eg, fitness, readiness and performance) and minimise the negative effects (eg, excessive fatigue, injury and illness) of training
 - ideal performance test and workload ‘metric’ should be sport-specific
