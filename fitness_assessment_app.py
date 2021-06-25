@@ -1,19 +1,22 @@
-from __future__ import print_function
 from itertools import zip_longest
 from gdoctableapppy import gdoctableapp
 import chartify
 from mimetypes import MimeTypes
+from googleapiclient.discovery import build
 
-from common import *
 from athlete import Athlete
 
+# Headers in Athlete data
+STR_NAME = "Name"
+STR_DATE = "Date"
 
-def extract_athletes_data_from_sheets(sheets_id, sheet_name, service=SHEETS):
+
+def extract_athletes_data_from_sheets(sheets_id, sheet_name, sheets_service):
     """
     Returns the athlete data from the given Google Sheet as a list of Athletes.
     """
     sheets_data = (
-        service.spreadsheets()
+        sheets_service.spreadsheets()
         .values()
         .get(spreadsheetId=sheets_id, range=sheet_name)
         .execute()
@@ -51,13 +54,13 @@ def get_copy_doc_name(athlete_name):
     return f"KBBMA Fitness Assessment - {athlete_name}"
 
 
-def copy_template_doc(copy_doc_name, docs_id, service=DRIVE):
+def copy_template_doc(copy_doc_name, docs_id, drive_service):
     """
     Copies letter template document using Drive API then
     returns file ID of (new) copy.
     """
     copy_doc_id = (
-        service.files()
+        drive_service.files()
         .copy(body={"name": copy_doc_name}, fileId=docs_id, fields="id")
         .execute()
         .get("id")
@@ -149,22 +152,27 @@ def create_chart():
     ]  # Execute the request.
 
 
-def generate_reports(tmpl_doc_id, sheets_id, sheet_name):
+def generate_reports(tmpl_doc_id, sheets_id, sheet_name, credentials):
+    # Service endpoints to Google APIs
+    DRIVE = build("drive", "v3", credentials=credentials)
+    DOCS = build("docs", "v1", credentials=credentials)
+    SHEETS = build("sheets", "v4", credentials=credentials)
+
     reports = []
 
     headers, athletes_list = extract_athletes_data_from_sheets(
-        sheets_id=sheets_id, sheet_name=sheet_name
+        sheets_id=sheets_id, sheet_name=sheet_name, sheets_service=SHEETS
     )
 
     for athlete in athletes_list:
         copy_doc_name = get_copy_doc_name(athlete.name)
         copy_doc_id = copy_template_doc(
-            copy_doc_name=copy_doc_name, docs_id=tmpl_doc_id
+            copy_doc_name=copy_doc_name, docs_id=tmpl_doc_id, drive_service=DRIVE
         )
 
         requests = []
         requests.append(replace_variables_in_doc(merge={STR_NAME: athlete.name}))
-        create_table_in_doc(athlete, headers, copy_doc_id)
+        # create_table_in_doc(athlete, headers, copy_doc_id)
 
         DOCS.documents().batchUpdate(
             documentId=copy_doc_id, body={"requests": requests}
