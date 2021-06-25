@@ -111,12 +111,14 @@ def callback():
     user_info = oauth2_client.userinfo().get().execute()
 
     # Doesn't exist? Add it to the database.
-    user = User(
-        id=user_info["id"],
-        name=user_info["email"],
-        email=user_info["given_name"],
-        profile_pic=user_info["picture"],
-    )
+    user = User.query.filter_by(id=user_info["id"]).first()
+    if not user:
+        user = User(
+            id=user_info["id"],
+            name=user_info["email"],
+            email=user_info["given_name"],
+            profile_pic=user_info["picture"],
+        )
 
     # Begin user session by logging the user in
     login_user(user)
