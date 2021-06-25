@@ -9,9 +9,9 @@ import google_auth_oauthlib.flow
 app = flask.Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY") or os.urandom(24)
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config[
-    "SQLALCHEMY_DATABASE_URI"
-] = "postgresql://wstloniawxdylv:1dd908e999a8a07363bcc90cd51a538ccf673428602c281fc7013acf38aab907@ec2-34-233-114-40.compute-1.amazonaws.com:5432/d3rop9tgagamsp"
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL").replace(
+    "://", "ql://", 1
+)
 
 # DB setup
 db = SQLAlchemy(app)
