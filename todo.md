@@ -1,13 +1,15 @@
 # TO DO
 Featurees
-- Authentication for other accounts does it work?
+- Deployed online
 - Instructions on home page - make it so someone can use it without any help
     - example doc
     - example sheet
 - Nice HTML -> use a template
+    - Loading animation
+    - Sign in page
+- One google doc named SHEET_NAME Results
 
 Next update:
-- Heroku vs Google Cloud - price?
 - Create a line graph
 - Divide HighPerformance and Regular students
     - HP: Recognized & Freestyle
