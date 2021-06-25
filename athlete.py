@@ -1,6 +1,3 @@
-from common import *
-
-
 class Athlete:
     def __init__(self, name: str, results):
         self.name = name
