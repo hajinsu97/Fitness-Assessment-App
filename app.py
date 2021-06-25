@@ -1,61 +1,26 @@
 # Python standard libraries
-import json
 import re
-import os
-import sqlite3
 
 # Third-party libraries
-import flask
 from flask_login import (
-    LoginManager,
     current_user,
     login_required,
     login_user,
     logout_user,
 )
 import google.oauth2.credentials
-import google_auth_oauthlib.flow
 from googleapiclient.discovery import build
 
 # Internal imports
-from db import init_db_command
-from user import User
+from config import *
+from user import *
 from fitness_assessment_app import generate_reports
 
-# Flask app setup
-app = flask.Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY") or os.urandom(24)
-
-# User session management setup
-# https://flask-login.readthedocs.io/en/latest
-login_manager = LoginManager()
-login_manager.init_app(app)
-
-# Naive database setup
-# try:
-#     init_db_command()
-# except sqlite3.OperationalError:
-#     # Assume it's already been created
-#     pass
-
-# Use the client_secret.json file to identify the application requesting
-# authorization. The client ID (from that file) and access scopes are required.
-flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
-    "google-credentials.json",
-    scopes=[
-        "openid",
-        "https://www.googleapis.com/auth/userinfo.email",
-        "https://www.googleapis.com/auth/userinfo.profile",
-        "https://www.googleapis.com/auth/drive",
-        "https://www.googleapis.com/auth/documents",
-        "https://www.googleapis.com/auth/spreadsheets.readonly",
-    ],
-)
 
 # Flask-Login helper to retrieve a user from our db
 @login_manager.user_loader
 def load_user(user_id):
-    return User.get(user_id)
+    return User.query.filter_by(_id=user_id).first()
 
 
 def get_file_id_from_url(url: str) -> str:
@@ -126,8 +91,6 @@ def login():
 
 @app.route("/login/callback")
 def callback():
-    print(flask.request)
-    state = flask.session["state"]
     flow.redirect_uri = flask.url_for("callback", _external=True)
 
     authorization_response = flask.request.url
@@ -147,17 +110,14 @@ def callback():
     oauth2_client = build("oauth2", "v2", credentials=credentials)
     user_info = oauth2_client.userinfo().get().execute()
 
-    # Create a user in the db with the information provided by Google
-    user = User.get(user_info["id"])
-
     # Doesn't exist? Add it to the database.
-    if not user:
-        User.create(
-            id_=user_info["id"],
-            name=user_info["email"],
-            email=user_info["given_name"],
-            profile_pic=user_info["picture"],
-        )
+    user = User(
+        _id=user_info["id"],
+        name=user_info["email"],
+        email=user_info["given_name"],
+        profile_pic=user_info["picture"],
+    )
+    create_user(user)
 
     # Begin user session by logging the user in
     login_user(user)
