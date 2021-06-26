@@ -1,12 +1,12 @@
 import os
 
 from flask_sqlalchemy import SQLAlchemy
-import flask
+from flask import Flask
 from flask_login import LoginManager
 import google_auth_oauthlib.flow
 
 # Flask app setup
-app = flask.Flask(__name__)
+app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY") or os.urandom(24)
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL").replace(

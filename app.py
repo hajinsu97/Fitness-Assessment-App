@@ -2,6 +2,7 @@
 import re
 
 # Third-party libraries
+from flask import request, url_for, escape, render_template, session, redirect
 from flask_login import (
     current_user,
     login_required,
@@ -44,9 +45,9 @@ def index():
                 current_user.name, current_user.email, current_user.profile_pic
             )
         )
-        doc_url = str(flask.escape(flask.request.args.get("doc_url", "")))
-        sheets_url = str(flask.escape(flask.request.args.get("sheets_url", "")))
-        sheets_name = str(flask.escape(flask.request.args.get("sheets_name", "")))
+        doc_url = str(escape(request.args.get("doc_url", "")))
+        sheets_url = str(escape(request.args.get("sheets_url", "")))
+        sheets_name = str(escape(request.args.get("sheets_name", "")))
         if doc_url and sheets_url and sheets_name:
             doc_id = get_file_id_from_url(doc_url)
             sheets_id = get_file_id_from_url(sheets_url)
@@ -63,7 +64,7 @@ def index():
               </form>"""
         return html
     else:
-        return '<a class="button" href="/login">Google Login</a>'
+        return render_template("login.html")
 
 
 @app.route("/login")
@@ -73,7 +74,7 @@ def login():
     # match one of the authorized redirect URIs for the OAuth 2.0 client, which you
     # configured in the API Console. If this value doesn't match an authorized URI,
     # you will get a 'redirect_uri_mismatch' error.
-    flow.redirect_uri = flask.request.base_url + "/callback"
+    flow.redirect_uri = request.base_url + "/callback"
 
     # Generate URL for request to Google's OAuth 2.0 server.
     # Use kwargs to set optional request parameters.
@@ -85,20 +86,20 @@ def login():
         include_granted_scopes="true",
     )
 
-    flask.session["state"] = state
-    return flask.redirect(authorization_url)
+    session["state"] = state
+    return redirect(authorization_url)
 
 
 @app.route("/login/callback")
 def callback():
-    flow.redirect_uri = flask.url_for("callback", _external=True)
+    flow.redirect_uri = url_for("callback", _external=True)
 
-    authorization_response = flask.request.url
+    authorization_response = request.url
     flow.fetch_token(authorization_response=authorization_response)
 
     # Store the credentials in the session.
     credentials = flow.credentials
-    flask.session["credentials"] = {
+    session["credentials"] = {
         "token": credentials.token,
         "refresh_token": credentials.refresh_token,
         "token_uri": credentials.token_uri,
@@ -124,14 +125,14 @@ def callback():
     login_user(user)
 
     # Send user back to homepage
-    return flask.redirect(flask.url_for("index"))
+    return redirect(url_for("index"))
 
 
 @app.route("/logout")
 @login_required
 def logout():
     logout_user()
-    return flask.redirect(flask.url_for("index"))
+    return redirect(url_for("index"))
 
 
 if __name__ == "__main__":

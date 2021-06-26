@@ -4,8 +4,8 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="utf-8">
-  <link rel="stylesheet" href="nicepage.css" media="screen">
-  <link rel="stylesheet" href="login.css" media="screen">
+  <link rel="stylesheet" href="{{url_for('static', filename='nicepage.css')}}" media="screen">
+  <link rel="stylesheet" href="{{url_for('static', filename='login.css')}}" media="screen">
   <script class="u-script" type="text/javascript" src="jquery.js" defer=""></script>
   <script class="u-script" type="text/javascript" src="nicepage.js" defer=""></script>
   <meta name="generator" content="Nicepage 3.18.2, nicepage.com">
@@ -21,12 +21,14 @@
           <div class="u-container-style u-layout-cell u-left-cell u-size-33 u-size-xs-60 u-white u-layout-cell-1"
             src="">
             <div class="u-container-layout u-container-layout-1">
-              <img class="u-image u-image-default u-image-1" src="images/mk-logo-retina1.png" alt=""
-                data-image-width="280" data-image-height="140">
+              <img class="u-image u-image-default u-image-1"
+                src="{{url_for('static', filename='images/mk-logo-retina1.png')}}" alt="" data-image-width="280"
+                data-image-height="140">
               <p class="u-align-center u-custom-font u-heading-font u-text u-text-1">KBBMA Fitness Assessment App</p>
               <h2 class="u-align-center u-text u-text-2">Welcome Back!</h2>
-              <img class="u-image u-image-default u-image-2" src="images/btn_google_signin_light_normal_web2x.png"
-                alt="" data-image-width="382" data-image-height="92">
+              <img class="u-image u-image-default u-image-2"
+                src="{{url_for('static', filename='images/btn_google_signin_light_normal_web2x.png')}}" alt=""
+                data-image-width="382" data-image-height="92">
             </div>
           </div>
           <div
