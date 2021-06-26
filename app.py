@@ -57,8 +57,10 @@ def index():
         else:
             # TODO: redirect to a /loading endpoint then /complete endpoint with @login_required
             html += """<form action="" method="get">
-                Google Doc URL: <input type="text" name="doc_url"><br>
-                Google Sheets URL: <input type="text" name="sheets_url"><br>
+                1) Create a folder in your Google Drive named "Fitness Assessments"<br>
+                <p>2) Copy the <a href="https://docs.google.com/document/d/1JfYsCbmk1uTGrgC15OFubSjPbbD0hopqv4d0xwOyzOM/edit?usp=sharing" target="_blank" rel="noopener noreferrer">Fitness Assessment Document Template </a> to the folder your just created and enter it's URL below.<br>Google Doc URL: <input type="text" name="doc_url"></p>
+                <p>3) Copy the <a href="https://docs.google.com/spreadsheets/d/1yJ7IM1NaNHq2xm7zPgHrV6lcidHhB5_gtVEUx-D7mm8/edit?usp=sharing" target="_blank" rel="noopener noreferrer">Fitness Tests Sheets Template</a> to the folder your just created and enter it's URL below.<br> Google Sheets URL: <input type="text" name="sheets_url"></p>
+                4) Enter the name of the sheet to generate reports for (e.g., Sheet1).<br>
                 Google Sheets Name: <input type="text" name="sheets_name"><br>
                 <input type="submit" value="Generate Reports">
               </form>"""
