@@ -17,7 +17,7 @@ html{
 }
 
 .u-section-1 .u-layout-cell-1 {
-  min-height: 828px;
+  min-height: 700px;
   pointer-events: auto;
 }
 
@@ -43,12 +43,6 @@ html{
   margin: 13px 11px 0;
 }
 
-.u-section-1 .u-image-2 {
-  width: 382px;
-  height: 92px;
-  margin: 53px auto 0;
-}
-
 .u-section-1 .u-image-3 {
   pointer-events: auto;
   background-image: url("images/login_tkd_wallpaper.jpg");
@@ -64,8 +58,7 @@ html{
 }
 
 .g-sign-in-button {
-    margin: 10px;
-    display: inline-block;
+    margin: 53px auto 0;
     width: 240px;
     height: 50px;
     background-color: #4285f4;
