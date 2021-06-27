@@ -118,8 +118,8 @@ def callback():
     if not user:
         user = User(
             id=user_info["id"],
-            name=user_info["email"],
-            email=user_info["given_name"],
+            email=user_info["email"],
+            name=user_info["given_name"],
             profile_pic=user_info["picture"],
         )
 
