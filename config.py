@@ -21,16 +21,13 @@ db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-# Use the client_secret.json file to identify the application requesting
-# authorization. The client ID (from that file) and access scopes are required.
-flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
-    "google-credentials.json",
-    scopes=[
-        "openid",
-        "https://www.googleapis.com/auth/userinfo.email",
-        "https://www.googleapis.com/auth/userinfo.profile",
-        "https://www.googleapis.com/auth/drive",
-        "https://www.googleapis.com/auth/documents",
-        "https://www.googleapis.com/auth/spreadsheets.readonly",
-    ],
-)
+# OAuth 2.0
+CLIENT_SECRETS_FILE = "google-credentials.json"
+SCOPES = [
+    "openid",
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile",
+    "https://www.googleapis.com/auth/drive",
+    "https://www.googleapis.com/auth/documents",
+    "https://www.googleapis.com/auth/spreadsheets.readonly",
+]

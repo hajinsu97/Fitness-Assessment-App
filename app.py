@@ -17,6 +17,11 @@ from config import *
 from models import *
 from fitness_assessment_app import generate_reports
 
+# Use the client_secret.json file to identify the application requesting
+# authorization. The client ID (from that file) and access scopes are required.
+flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
+    CLIENT_SECRETS_FILE, scopes=SCOPES
+)
 
 # Flask-Login helper to retrieve a user from our db
 @login_manager.user_loader
@@ -94,6 +99,12 @@ def login():
 
 @app.route("/login/callback")
 def callback():
+    # Use the client_secret.json file and the state from the authorization_url
+    # to identify the application requesting authorization.
+    flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
+        CLIENT_SECRETS_FILE, scopes=SCOPES, state=session["state"]
+    )
+
     flow.redirect_uri = url_for("callback", _external=True)
 
     authorization_response = request.url
