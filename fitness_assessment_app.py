@@ -103,7 +103,7 @@ def replace_variables_in_doc(merge):
     return requests
 
 
-def create_table_in_doc(athlete, headers, doc_id):
+def create_table_in_doc(athlete, headers, doc_id, credentials):
     """
     Add the athlete's data to the table in the Google Doc.
     """
@@ -115,7 +115,7 @@ def create_table_in_doc(athlete, headers, doc_id):
     values = list(map(list, zip_longest(*values, fillvalue="")))
 
     resource = {
-        "oauth2": CREDS,
+        "oauth2": credentials,
         "documentId": doc_id,
         "tableIndex": 0,
         "values": values,
@@ -172,7 +172,7 @@ def generate_reports(tmpl_doc_id, sheets_id, sheet_name, credentials):
 
         requests = []
         requests.append(replace_variables_in_doc(merge={STR_NAME: athlete.name}))
-        # create_table_in_doc(athlete, headers, copy_doc_id)
+        create_table_in_doc(athlete, headers, copy_doc_id, credentials)
 
         DOCS.documents().batchUpdate(
             documentId=copy_doc_id, body={"requests": requests}

@@ -39,6 +39,17 @@ def get_doc_url_from_id(doc_id: str) -> str:
     return f"https://docs.google.com/document/d/{doc_id}"
 
 
+def build_credentials():
+    credentials = session["credentials"]
+    return google.oauth2.credentials.Credentials(
+        credentials["token"],
+        refresh_token=credentials["refresh_token"],
+        token_uri=credentials["token_uri"],
+        client_id=credentials["client_id"],
+        client_secret=credentials["client_secret"],
+    )
+
+
 @app.route("/")
 def index():
     if current_user.is_authenticated:
@@ -56,7 +67,7 @@ def index():
         if doc_url and sheets_url and sheets_name:
             doc_id = get_file_id_from_url(doc_url)
             sheets_id = get_file_id_from_url(sheets_url)
-            docs = generate_reports(doc_id, sheets_id, sheets_name, flow.credentials)
+            docs = generate_reports(doc_id, sheets_id, sheets_name, build_credentials())
             for (doc_name, doc_id) in docs:
                 html += f'<a href="{get_doc_url_from_id(doc_id)}">{doc_name}</a><br>'
         else:
@@ -112,6 +123,7 @@ def callback():
 
     # Store the credentials in the session.
     credentials = flow.credentials
+    print(credentials)
     session["credentials"] = {
         "token": credentials.token,
         "refresh_token": credentials.refresh_token,
@@ -120,6 +132,7 @@ def callback():
         "client_secret": credentials.client_secret,
         "scopes": credentials.scopes,
     }
+    print(session["credentials"])
 
     oauth2_client = build("oauth2", "v2", credentials=credentials)
     user_info = oauth2_client.userinfo().get().execute()
@@ -135,7 +148,7 @@ def callback():
         )
 
     # Begin user session by logging the user in
-    login_user(user)
+    login_user(user, remember=True)
 
     # Send user back to homepage
     return redirect(url_for("index"))
@@ -149,4 +162,5 @@ def logout():
 
 
 if __name__ == "__main__":
-    app.run(ssl_context="adhoc")
+    app.run(ssl_context="adhoc", host="localhost")
+    # app.run(ssl_context="adhoc")
